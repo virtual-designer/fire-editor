@@ -110,7 +110,7 @@ fire_rows_init(FILE *file)
 
     fire_buffer_append(&buffer, "");
     
-    while ((linelen = getline(&line, &linecap, file)) != -1) {
+    while ((linelen = getline(&line, &linecap, file)) != -1) {        
         fire_buffer_append(&buffer, line);
         fire_buffer_append(&buffer, "\n");
 
@@ -122,6 +122,18 @@ fire_rows_init(FILE *file)
 
         config.lines[i].len = linelen;
         config.lines[i].s = strdup(line);
+        char *tmp = strdup(line);
+        int k = 0;
+
+        for (int j = 0; j < linelen; j++) {
+            if (tmp[j] != '\r') {
+                config.lines[i].s[k++] = tmp[j]; 
+            }
+        }
+
+        config.lines[i].s[k] = '\0';
+
+        free(tmp);
 
         line_count++;
         i++;
@@ -140,7 +152,7 @@ fire_render_rows()
 
     fire_buffer_t buffer = { NULL, 0 };
 
-    for (ssize_t i = config.offset; i < (config.line_count - 1) && i < (config.rows + config.offset - 1); i++) {    
+    for (ssize_t i = config.offset; i < (config.line_count - 1) && i < (config.rows + config.offset - 1); i++) {   
         fire_buffer_append(&buffer, config.lines[i].s);
     }
 
@@ -239,6 +251,7 @@ fire_read_keys()
             case KEY_LEFT:
 
             break;
+
             case KEY_RIGHT:
                 
             break;
