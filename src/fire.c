@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <curses.h>
+#include <sys/ttydefaults.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -46,7 +47,8 @@ fire_error(char *err, bool fetch_msg)
 }
 
 bool 
-fire_buffer_append(fire_buffer_t *buffer, char *s) {
+fire_buffer_append(fire_buffer_t *buffer, char *s) 
+{
     ssize_t len = strlen(s);
     char *new_pointer = realloc(buffer->content, buffer->len + (len * sizeof (char)));
 
@@ -101,39 +103,6 @@ void fire_setup_color_pairs()
 void
 fire_rows_init(FILE *file) 
 {
-
-    endwin();
-    // char *dup = strdup(buffer.content);
-    // char *line = strtok(dup, "\n");
-    // ssize_t line_count = 1, i = 0;
-
-    // do {
-    //     config.lines = realloc(config.lines, sizeof (fire_editor_row_t) * (i + 1));
-
-    //     if (config.lines == NULL) {
-    //         fire_error("realloc failed", true);
-    //     }
-
-    //     config.lines[i].len = strlen(line);
-    //     config.lines[i].s = strdup(line);
-
-    //     if (line_count == 12) {
-    //         endwin();
-    //         printf("Content: %s\n", config.lines[i].s);
-    //         exit(0);
-    //     }
-
-    //     // fprintf(logbuffer, "%s\n", config.lines[i].s);
-
-    //     line_count++;
-    //     i++;
-    // } 
-    // while ((line = strtok(NULL, "\n")) != NULL);
-
-    // config.line_count = line_count;
-
-    // free(dup);
-
     char *line = NULL;
     size_t linecap = 0;
     ssize_t linelen;
@@ -162,44 +131,6 @@ fire_rows_init(FILE *file)
     line = NULL;
     config.line_count = line_count;
 }
-
-// void
-// fire_draw_rows() 
-// {
-//     clear();
-//     fire_draw_statusbar();
-//     char *dup = strdup(buffer.content);
-//     char *line = strtok(dup, "\n");
-//     ssize_t line_count = 1;
-
-//     fprintf(logbuffer, "Len: %lu\n", buffer.len);
-
-//     do {
-//         if ((line_count - config.offset) >= (config.rows)) {
-//             break;
-//         }
-
-//         if (line_count <= config.offset) {
-//             line_count++;
-//             continue;
-//         }
-
-//         if (line_count == (config.offset + config.cury)) {
-//             config.current_linelen = strlen(line);
-//         }
-
-//         printw("%s\n", line);
-//         line_count++;
-//     } 
-//     while ((line = strtok(NULL, "\n")) != NULL);
-
-//     config._lines = line_count;
-//     refresh();
-//     free(dup);
-
-//     config.curx = getcurx(stdscr);
-//     config.cury = getcury(stdscr);
-// }
 
 void
 fire_render_rows() 
@@ -281,7 +212,7 @@ fire_read_keys()
     config.curx = getcurx(stdscr);
     config.cury = getcury(stdscr);
 
-    while ((c = getch()) != 'q') {
+    while ((c = getch()) != CTRL('x')) {
         switch (c) {
             case KEY_UP:
                 if (config.offset > 0 && config.cury < 2) {
